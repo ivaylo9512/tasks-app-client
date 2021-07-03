@@ -1,10 +1,10 @@
 import React, {useState, useRef } from 'react';
 import useEffectInitial from './useEffectInitital';
 
-type Hook = (params : {name: string, placeholder?: string, validationRules?: [], initialValue?: string, equalValue?: string, equalName?: string}) => JSX.Element
+type Hook = (params : {name: string, type?: string,  placeholder?: string, validationRules?: [], initialValue?: string, equalValue?: string, equalName?: string}) => JSX.Element
 
-const useInput: Hook = ({name, placeholder, validationRules, initialValue, equalValue, equalName }) => {
-    const [value, setValue] = useState<string | undefined>(initialValue);
+const useInput: Hook = ({name, placeholder, validationRules, type= 'text', initialValue = '', equalValue, equalName}) => {
+    const [value, setValue] = useState<string>(initialValue);
     const inputElement = useRef<HTMLInputElement | null>(null);
     
     useEffectInitial(() => {
@@ -26,7 +26,7 @@ const useInput: Hook = ({name, placeholder, validationRules, initialValue, equal
         validate(value)
     }
 
-    const input = <input name={name} placeholder={placeholder} ref={inputElement} {...validationRules} onChange={onChange}/>
+    const input = <input name={name} value={value} type={type} placeholder={placeholder} ref={inputElement} {...validationRules} onChange={onChange}/>
 
     return input
 }

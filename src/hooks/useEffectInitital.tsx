@@ -1,8 +1,8 @@
 import { useRef, useEffect, DependencyList } from "react"
 
-type useInitital = (state: DependencyList, callback: Function) => void
+type useInitital = (callback: Function, state: DependencyList) => void
 
-const useEffectInitial: useInitital = (dependencies, callback)  => {
+const useEffectInitial: useInitital = (callback, dependencies)  => {
     const isInitial = useRef(true);
 
     useEffect(() => {
