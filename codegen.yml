@@ -1,12 +1,12 @@
 overwrite: true
-schema: "http://localhost:8099/graphql"
+schema: ["http://localhost:8099/graphql", "http://localhost:8056/graphql" ]
 documents: "src/graphql/**/*.graphql"
 generates:
   src/generated/graphql.tsx:
     plugins:
       - "typescript"
       - "typescript-operations"
-      - "typescript-react-urql"
+      - "typescript-urql"
   ./graphql.schema.json:
     plugins:
       - "introspection"
