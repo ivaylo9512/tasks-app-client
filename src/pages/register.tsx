@@ -13,6 +13,10 @@ interface FieldError {
   }
 
 const Register: React.FC<registerProps> = () => {
+    let registerInput = useRef<{username: string, password: string, firstName:string, lastName: string, age: Date}>()
+    const [registerValue, registerMut] = useQuery<RegisterMutation, RegisterMutationVariables>({ query: RegisterDocument, pause: !registerInput.current, variables: registerInput.current, context: useMemo(() => ({url: 'http://localhost:8056/graphql'}), [])});
+    const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
+
     const [username, usernameInput] = useInput({
         name: 'username',
         placeholder: 'username', 
@@ -60,6 +64,7 @@ const Register: React.FC<registerProps> = () => {
             required: true
         } 
     })
+    
     const [age, ageInput] = useInput({
         type: 'date',
         name: 'age', 
@@ -70,8 +75,22 @@ const Register: React.FC<registerProps> = () => {
         } 
     })
 
+    const register = async (e: FormEvent) => {
+        e.preventDefault();
+        
+        registerInput.current = {username, password, firstName, lastName, age: new Date(age)};
+        console.log(registerInput.current);
+        registerMut();
+    }
+
+    useEffect(() => {
+        const errors = registerValue.data?.register.errors;
+        const errorObject = errors?.reduce((obj: {[name: string] : string}, err) =>(obj[err.field] = err.message, obj), {});
+        setErrors(errorObject);
+    },[registerValue])
+
     return(
-        <form>
+        <form onSubmit={register}>
             {usernameInput}
             {passwordInput}
             {repeatPasswordInput}
