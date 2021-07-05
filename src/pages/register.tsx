@@ -1,21 +1,14 @@
-import { useRegisterMutation, RegisterDocument, RegisterMutation, RegisterMutationVariables } from "../generated/graphql";
+import { RegisterDocument, RegisterMutation, RegisterMutationVariables } from "../generated/graphql";
 import { useState, FormEvent, useMemo, useRef, useEffect } from "react";
 import useInput from "../hooks/useInput";
 import { useQuery } from "urql";
-
-interface registerProps{
-
-}
-
-interface FieldError {
-    field: string,
-    message: string
-  }
+import InputWithError from "../components/InputWithError";
 
 const Register: React.FC<registerProps> = () => {
-    let registerInput = useRef<{username: string, password: string, firstName:string, lastName: string, age: Date}>()
+    const registerInput = useRef<{username: string, password: string, firstName:string, lastName: string, age: Date}>()
     const [registerValue, registerMut] = useQuery<RegisterMutation, RegisterMutationVariables>({ query: RegisterDocument, pause: !registerInput.current, variables: registerInput.current, context: useMemo(() => ({url: 'http://localhost:8056/graphql'}), [])});
     const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
+    const [pageCount, setPageCount] = useState(0);
 
     const [username, usernameInput] = useInput({
         name: 'username',
@@ -64,7 +57,7 @@ const Register: React.FC<registerProps> = () => {
             required: true
         } 
     })
-    
+
     const [age, ageInput] = useInput({
         type: 'date',
         name: 'age', 
@@ -89,16 +82,28 @@ const Register: React.FC<registerProps> = () => {
         setErrors(errorObject);
     },[registerValue])
 
+    const changePage = () => {
+        event?.preventDefault();
+        setPageCount(event?.currentTarget.dataset.page)
+    }
     return(
-        <form onSubmit={register}>
-            {usernameInput}
-            {passwordInput}
-            {repeatPasswordInput}
-            {firstNameInput}
-            {lastNameInput}
-            {ageInput}
-            <button>register</button>
-        </form>
+        <section>
+            {pageCount == 0 ?
+                <form onSubmit={register}>
+                    <InputWithError classname='dsa' error={errors?.username} input={usernameInput} />
+                    <InputWithError error={errors?.password} input={passwordInput} />
+                    <InputWithError input={repeatPasswordInput} />      
+                    <button data-page='1' onClick={changePage}>register</button>
+                </form>  :
+                <form onSubmit={register}>
+                    <InputWithError error={errors?.firstName} input={firstNameInput} />
+                    <InputWithError error={errors?.lastName} input={lastNameInput} />
+                    <InputWithError error={errors?.age} input={ageInput} />
+                    <button data-page = '0' onClick={changePage} >prev</button>
+                    <button type='submit'>register</button>
+                </form>
+            }
+        </section>
     )
 }
 export default Register
