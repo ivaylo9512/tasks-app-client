@@ -1,7 +1,7 @@
-import React, {useState, useRef } from 'react';
+import React, {useState, useRef, InputHTMLAttributes } from 'react';
 import useEffectInitial from './useEffectInitital';
 
-type Hook = (params : {name: string, type?: string,  placeholder?: string, validationRules?: [], initialValue?: string, equalValue?: string, equalName?: string}) => JSX.Element
+type Hook = (params : {name: string, type?: string,  placeholder?: string, validationRules?: InputHTMLAttributes<HTMLInputElement>, initialValue?: string, equalValue?: string, equalName?: string}) => [string, JSX.Element]
 
 const useInput: Hook = ({name, placeholder, validationRules, type= 'text', initialValue = '', equalValue, equalName}) => {
     const [value, setValue] = useState<string>(initialValue);
@@ -28,7 +28,10 @@ const useInput: Hook = ({name, placeholder, validationRules, type= 'text', initi
 
     const input = <input name={name} value={value} type={type} placeholder={placeholder} ref={inputElement} {...validationRules} onChange={onChange}/>
 
-    return input
+    return [
+        value,
+        input
+    ]
 }
 
 export default useInput

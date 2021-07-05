@@ -1,17 +1,12 @@
+overwrite: true
 schema: ["http://localhost:8099/graphql", "http://localhost:8056/graphql" ]
-
 documents: "src/graphql/**/*.graphql"
 generates:
-  src/generated/graphqlPlatform.tsx:
-    plugins:
-      - "typescript"
-      - "typescript-operations"
-      - "typescript-urql"
   src/generated/graphql.tsx:
     plugins:
       - "typescript"
       - "typescript-operations"
       - "typescript-urql"
-  ./graphql.schemaPlatform.json:
+  ./graphql.schema.json:
     plugins:
       - "introspection"

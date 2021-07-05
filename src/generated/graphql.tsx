@@ -12,7 +12,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
 };
+
 
 export type FieldError = {
   __typename?: 'FieldError';
@@ -76,6 +79,7 @@ export type RegisterInput = {
   password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  age: Scalars['DateTime'];
 };
 
 export type Task = {
@@ -93,6 +97,7 @@ export type User = {
   username: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  age: Scalars['String'];
 };
 
 export type UserInput = {
@@ -111,6 +116,7 @@ export type RegisterMutationVariables = Exact<{
   password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  age: Scalars['DateTime'];
 }>;
 
 
@@ -130,9 +136,9 @@ export type RegisterMutation = (
 
 
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!, $firstName: String!, $lastName: String!) {
+    mutation Register($username: String!, $password: String!, $firstName: String!, $lastName: String!, $age: DateTime!) {
   register(
-    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName}
+    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName, age: $age}
   ) {
     errors {
       field
