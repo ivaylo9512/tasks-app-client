@@ -13,6 +13,9 @@ mutation Register($username: String!, $password: String!, $firstName: String!, $
         user {
             id
             username
+            firstName
+            lastName
+            age
         }
     }
 }
