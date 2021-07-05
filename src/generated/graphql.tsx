@@ -46,7 +46,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
-  userInput: UserInput;
+  registerInput: RegisterInput;
 };
 
 
@@ -71,6 +71,13 @@ export type QueryGetTaskArgs = {
   id: Scalars['Float'];
 };
 
+export type RegisterInput = {
+  username: Scalars['String'];
+  password: Scalars['String'];
+  firstName: Scalars['String'];
+  lastName: Scalars['String'];
+};
+
 export type Task = {
   __typename?: 'Task';
   id: Scalars['Int'];
@@ -84,6 +91,8 @@ export type User = {
   __typename?: 'User';
   id: Scalars['Float'];
   username: Scalars['String'];
+  firstName: Scalars['String'];
+  lastName: Scalars['String'];
 };
 
 export type UserInput = {
@@ -100,6 +109,8 @@ export type UserResponse = {
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
+  firstName: Scalars['String'];
+  lastName: Scalars['String'];
 }>;
 
 
@@ -119,8 +130,10 @@ export type RegisterMutation = (
 
 
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!) {
-  register(userInput: {username: $username, password: $password}) {
+    mutation Register($username: String!, $password: String!, $firstName: String!, $lastName: String!) {
+  register(
+    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName}
+  ) {
     errors {
       field
       message
