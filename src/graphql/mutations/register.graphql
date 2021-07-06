@@ -11,11 +11,7 @@ mutation Register($username: String!, $password: String!, $firstName: String!, $
             message
         }
         user {
-            id
-            username
-            firstName
-            lastName
-            age
+            ...UserFragment
         }
     }
 }
