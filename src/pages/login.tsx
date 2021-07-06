@@ -11,7 +11,12 @@ const Login = () => {
         placeholder: 'username or email', 
         name: 'username'
     });
-    const [password, passwordInput] = useInput({placeholder: 'password', name: 'password', type: 'password'});
+    const [password, passwordInput] = useInput({
+        placeholder: 'password', 
+        name: 'password', 
+        type: 'password',
+        autoComplete: 'current-password',
+    });
     const [loginValue, loginMut] = useQuery<LoginMutation, LoginMutationVariables>({ query: LoginDocument, pause: !loginInput.current, variables: loginInput.current, context: useMemo(() => ({ url: 'http://localhost:8056/graphql'}), [])})
     
     const login = (e: FormEvent) => {

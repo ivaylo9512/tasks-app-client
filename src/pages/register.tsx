@@ -19,7 +19,8 @@ const Register: React.FC = () => {
 
     const [username, usernameInput] = useInput({
         name: 'username',
-        placeholder: 'username', 
+        placeholder: 'username',
+        autoComplete: 'username',
         validationRules: {
             required: true, 
             minLength: 9, 
@@ -30,6 +31,7 @@ const Register: React.FC = () => {
     const [password, passwordInput] = useInput({
         name: 'password',
         type: 'password',
+        autoComplete: 'new-password',
         placeholder: 'password',
         validationRules: {
             minLength: 10,
@@ -41,6 +43,7 @@ const Register: React.FC = () => {
     const [repeatPassword, repeatPasswordInput] = useInput({
         name: 'repeat-password',
         type: 'password',
+        autoComplete: 'new-password',
         placeholder: 'repeat',
         validationRules:{
             required: true
@@ -78,7 +81,8 @@ const Register: React.FC = () => {
     const [email, emailInput] = useInput({
         type: 'email',
         placeholder: 'email',
-        name: 'email'
+        name: 'email',
+        autoComplete: 'email'
     })
 
     const register = async (e: FormEvent) => {

@@ -1,9 +1,9 @@
 import React, {useState, useRef, InputHTMLAttributes } from 'react';
 import useEffectInitial from './useEffectInitital';
 
-type Hook = (params : {name: string, type?: string,  placeholder?: string, validationRules?: InputHTMLAttributes<HTMLInputElement>, initialValue?: string, equalValue?: string, equalName?: string}) => [string, JSX.Element]
+type Hook = (params : {name: string, type?: string, autoComplete?: string, placeholder?: string, validationRules?: InputHTMLAttributes<HTMLInputElement>, initialValue?: string, equalValue?: string, equalName?: string}) => [string, JSX.Element]
 
-const useInput: Hook = ({name, placeholder, validationRules, type= 'text', initialValue = '', equalValue, equalName}) => {
+const useInput: Hook = ({name, placeholder, validationRules, autoComplete, type= 'text', initialValue = '', equalValue, equalName}) => {
     const [value, setValue] = useState<string>(initialValue);
     const inputElement = useRef<HTMLInputElement | null>(null);
     
@@ -26,7 +26,7 @@ const useInput: Hook = ({name, placeholder, validationRules, type= 'text', initi
         validate(value)
     }
 
-    const input = <input name={name} value={value} type={type} placeholder={placeholder} ref={inputElement} {...validationRules} onChange={onChange}/>
+    const input = <input name={name} value={value} type={type} placeholder={placeholder} autoComplete={autoComplete} ref={inputElement} {...validationRules} onChange={onChange}/>
 
     return [
         value,
