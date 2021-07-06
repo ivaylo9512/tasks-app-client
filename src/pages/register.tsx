@@ -7,6 +7,7 @@ import Link from 'next/link';
 import validateEmail from '../helpers/validateEmail';
 import { withUrqlClient } from 'next-urql';
 import { createClient } from '../helpers/client';
+import useEffectInitial from '../hooks/useEffectInitital';
 import { useRouter } from 'next/router';
 
 const Register: React.FC = () => {
@@ -14,6 +15,7 @@ const Register: React.FC = () => {
     const [registerValue, registerMut] = useQuery<RegisterMutation, RegisterMutationVariables>({ query: RegisterDocument, pause: !registerInput.current, variables: registerInput.current, context: useMemo(() => ({url: 'http://localhost:8056/graphql'}), [])});
     const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
     const [pageCount, setPageCount] = useState(0);
+    const router = useRouter();
 
     const [username, usernameInput] = useInput({
         name: 'username',
@@ -89,15 +91,28 @@ const Register: React.FC = () => {
         registerMut();
     }
 
-    useEffect(() => {
+    useEffectInitial(() => {
+        if(registerValue.fetching){
+            return;
+        }
         const errors = registerValue.data?.register.errors;
         const errorObject = errors?.reduce((obj: {[name: string] : string}, err) =>(obj[err.field] = err.message, obj), {});
+
+        if(!errorObject){
+            router.push('/');
+            return;
+        }
+
+        const { username, email, password, repeatPassword } = errorObject;
+        if(username || email || password || repeatPassword){
+            setPageCount(0);
+        }
         setErrors(errorObject);
     },[registerValue])
 
-    const changePage = () => {
+    const changePage = (event : MouseEvent<HTMLElement> | FormEvent) => {
         event?.preventDefault();
-        setPageCount(event?.currentTarget.dataset.page)
+        setPageCount(prev => prev ? 0 : 1)
     }
 
     return(
