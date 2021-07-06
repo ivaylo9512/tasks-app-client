@@ -1,6 +1,6 @@
 import useInput from "../hooks/useInput"
 import Link from 'next/link'
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, FormEvent } from "react";
 import { useQuery } from "urql";
 import { LoginDocument, LoginMutation, LoginMutationVariables, UserInput } from "../generated/graphql";
 import validateEmail from "../helpers/validateEmail";
@@ -14,9 +14,11 @@ const Login = () => {
     const [password, passwordInput] = useInput({placeholder: 'password', name: 'password', type: 'password'});
     const [loginValue, loginMut] = useQuery<LoginMutation, LoginMutationVariables>({ query: LoginDocument, pause: !loginInput.current, variables: loginInput.current, context: useMemo(() => ({ url: 'http://localhost:8056/graphql'}), [])})
     
-    const login = () => {
-        validateEmail(usernameOrEmail)
-        loginInput.current = {username: usernameOrEmail, password}
+    const login = (e: FormEvent) => {
+        e.preventDefault();
+        loginInput.current = { 
+            ...validateEmail(usernameOrEmail) ? {email: usernameOrEmail} : { username: usernameOrEmail }, 
+            password}
         loginMut();
     }
 

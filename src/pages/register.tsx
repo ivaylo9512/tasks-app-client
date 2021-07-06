@@ -1,11 +1,16 @@
-import { RegisterDocument, RegisterMutation, RegisterMutationVariables } from "../generated/graphql";
-import { useState, FormEvent, useMemo, useRef, useEffect } from "react";
-import useInput from "../hooks/useInput";
-import { useQuery } from "urql";
-import InputWithError from "../components/InputWithError";
+import { RegisterDocument, RegisterMutation, RegisterMutationVariables, RegisterInput } from '../generated/graphql';
+import { useState, FormEvent, useMemo, useRef, useEffect, MouseEvent } from 'react';
+import useInput from '../hooks/useInput';
+import { useQuery } from 'urql';
+import InputWithError from '../components/InputWithError';
+import Link from 'next/link';
+import validateEmail from '../helpers/validateEmail';
+import { withUrqlClient } from 'next-urql';
+import { createClient } from '../helpers/client';
+import { useRouter } from 'next/router';
 
-const Register: React.FC<registerProps> = () => {
-    const registerInput = useRef<{username: string, password: string, firstName:string, lastName: string, age: Date}>()
+const Register: React.FC = () => {
+    const registerInput = useRef<RegisterInput>()
     const [registerValue, registerMut] = useQuery<RegisterMutation, RegisterMutationVariables>({ query: RegisterDocument, pause: !registerInput.current, variables: registerInput.current, context: useMemo(() => ({url: 'http://localhost:8056/graphql'}), [])});
     const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
     const [pageCount, setPageCount] = useState(0);
@@ -68,11 +73,19 @@ const Register: React.FC<registerProps> = () => {
         } 
     })
 
+    const [email, emailInput] = useInput({
+        type: 'email',
+        placeholder: 'email',
+        name: 'email'
+    })
+
     const register = async (e: FormEvent) => {
         e.preventDefault();
-        
-        registerInput.current = {username, password, firstName, lastName, age: new Date(age)};
-        console.log(registerInput.current);
+        if(!validateEmail(email)){
+            setErrors({ email: 'Invalid email' });
+            return;
+        }
+        registerInput.current = {username, password, email, firstName, lastName, age: new Date(age)};
         registerMut();
     }
 
@@ -86,24 +99,27 @@ const Register: React.FC<registerProps> = () => {
         event?.preventDefault();
         setPageCount(event?.currentTarget.dataset.page)
     }
+
     return(
         <section>
             {pageCount == 0 ?
-                <form onSubmit={register}>
-                    <InputWithError classname='dsa' error={errors?.username} input={usernameInput} />
-                    <InputWithError error={errors?.password} input={passwordInput} />
+                <form onSubmit={changePage}>
+                    <InputWithError input={usernameInput} error={errors?.username}  />
+                    <InputWithError input={emailInput} error={errors?.email} />      
+                    <InputWithError input={passwordInput} error={errors?.password} />
                     <InputWithError input={repeatPasswordInput} />      
-                    <button data-page='1' onClick={changePage}>register</button>
+                    <button data-page='1'>next</button>
+                    <span>Already have an account?<Link href='/login'> Sign in.</Link></span>
                 </form>  :
                 <form onSubmit={register}>
-                    <InputWithError error={errors?.firstName} input={firstNameInput} />
-                    <InputWithError error={errors?.lastName} input={lastNameInput} />
-                    <InputWithError error={errors?.age} input={ageInput} />
-                    <button data-page = '0' onClick={changePage} >prev</button>
+                    <InputWithError input={firstNameInput} error={errors?.firstName} />
+                    <InputWithError input={lastNameInput} error={errors?.lastName} />
+                    <InputWithError input={ageInput} error={errors?.age} />
+                    <button onClick={changePage} >prev</button>
                     <button type='submit'>register</button>
                 </form>
             }
         </section>
     )
 }
-export default Register
+export default withUrqlClient(createClient)(Register)
