@@ -3,5 +3,6 @@ fragment UserFragment on User {
     username
     firstName
     lastName
-    age
+    age,
+    email
 }

@@ -79,6 +79,7 @@ export type RegisterInput = {
   password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  email: Scalars['String'];
   age: Scalars['DateTime'];
 };
 
@@ -97,11 +98,13 @@ export type User = {
   username: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
+  email: Scalars['String'];
   age: Scalars['String'];
 };
 
 export type UserInput = {
-  username: Scalars['String'];
+  username?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
   password: Scalars['String'];
 };
 
@@ -113,11 +116,12 @@ export type UserResponse = {
 
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age'>
+  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age' | 'email'>
 );
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
+  username?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
   password: Scalars['String'];
 }>;
 
@@ -138,6 +142,7 @@ export type LoginMutation = (
 
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
+  email: Scalars['String'];
   password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
@@ -166,11 +171,12 @@ export const UserFragmentFragmentDoc = gql`
   firstName
   lastName
   age
+  email
 }
     `;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(userInput: {username: $username, password: $password}) {
+    mutation Login($username: String, $email: String, $password: String!) {
+  login(userInput: {username: $username, password: $password, email: $email}) {
     errors {
       field
       message
@@ -186,9 +192,9 @@ export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
 };
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!, $firstName: String!, $lastName: String!, $age: DateTime!) {
+    mutation Register($username: String!, $email: String!, $password: String!, $firstName: String!, $lastName: String!, $age: DateTime!) {
   register(
-    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName, age: $age}
+    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName, age: $age, email: $email}
   ) {
     errors {
       field
