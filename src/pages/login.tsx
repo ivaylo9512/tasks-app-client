@@ -7,20 +7,14 @@ import validateEmail from "../helpers/validateEmail";
 
 const Login = () => {
     const loginInput = useRef<UserInput>();
-    const [usernameOrEmail, usernameOrEmailInput] = useInput({
-        placeholder: 'username or email', 
-        name: 'username'
-    });
-    const [password, passwordInput] = useInput({
-        placeholder: 'password', 
-        name: 'password', 
-        type: 'password',
-        autoComplete: 'current-password',
-    });
+    const [userValues, {usernameOrEmailInput, passwordInput}] = useCreateInputs();
     const [loginValue, loginMut] = useQuery<LoginMutation, LoginMutationVariables>({ query: LoginDocument, pause: !loginInput.current, variables: loginInput.current, context: useMemo(() => ({ url: 'http://localhost:8056/graphql'}), [])})
     
     const login = (e: FormEvent) => {
         e.preventDefault();
+        
+        const {usernameOrEmail, password} = userValues;
+
         loginInput.current = { 
             ...validateEmail(usernameOrEmail) ? {email: usernameOrEmail} : { username: usernameOrEmail }, 
             password}
@@ -37,8 +31,8 @@ const Login = () => {
                 {usernameOrEmailInput}
                 {passwordInput}
                 <div className='errors'>
-                    {loginValue.data?.login.errors?.map(err => 
-                        <span>{err.message}</span>
+                    {loginValue.data?.login.errors?.map((err, i) => 
+                        <span key={i}>{err.message}</span>
                     )}
                 </div>
                 <span>Don't have an account?<Link href="/register"> Sign up.</Link></span>
@@ -48,3 +42,26 @@ const Login = () => {
     )
 }
 export default Login
+
+type Inputs = {
+    usernameOrEmailInput: JSX.Element,
+    passwordInput: JSX.Element
+}
+
+type Values = {
+    usernameOrEmail: string,
+    password: string
+}
+const useCreateInputs = () : [Values, Inputs]=> {
+    const [usernameOrEmail, usernameOrEmailInput] = useInput({
+        placeholder: 'username or email', 
+        name: 'username'
+    });
+    const [password, passwordInput] = useInput({
+        placeholder: 'password', 
+        name: 'password', 
+        type: 'password',
+        autoComplete: 'current-password',
+    });
+    return [{usernameOrEmail, password}, {usernameOrEmailInput, passwordInput}]
+}
