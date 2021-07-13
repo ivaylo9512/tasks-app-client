@@ -20,12 +20,10 @@ const Container = styled.div`
     color: white;
     justify-content: center;
     align-items: center;
-    font-size: 1vw;
 `
-const DayContainer = React.memo(({ day, hasEvent } : {day: number, hasEvent: boolean}) => {
-    console.log('render' + day)
+const DayContainer = React.memo(({ day, hasEvent, setDate } : {day: number, hasEvent: boolean, setDate: () => void}) => {
     return(
-        <Button>
+        <Button onClick={setDate}>
             <Container>
                 {day}
                 {hasEvent}

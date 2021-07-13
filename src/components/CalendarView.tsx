@@ -54,11 +54,7 @@ type CalendarProps = {
 }
 
 const CalendarView = ({locales = 'en', format = 'long', date, setDate} : CalendarProps) => {
-    const [days, setDays] = useState<Map<string, Day>>(() => {
-        const date = new Date();
-        setDate(date);
-        return generateDays(date.getFullYear(), date.getMonth());
-    });
+    const [days, setDays] = useState<Map<string, Day>>(() => generateDays(date.getFullYear(), date.getMonth()));
 
     const monthNames = useMemo(() => getMonthNames(locales, format), [locales, format]);
     const setYear = ({ target: { value } } :  {target: HTMLInputElement }) => {
