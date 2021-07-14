@@ -1,7 +1,3 @@
-import CreateTask from '../components/CreateTask'
-import { withUrqlClient } from 'next-urql';
-import Link from 'next/link';
-import Calendar from '../components/CalendarView';
 import styled from 'styled-components';
 import TaskView from '../components/TasksView';
 
@@ -15,7 +11,7 @@ const Section = styled.section`
     height: 100%;
 `
 
-const daily = () => {
+const Daily: React.FC = () => {
 
     return(
         <Section>
@@ -25,4 +21,4 @@ const daily = () => {
         </Section>
     )
 }
-export default daily 
+export default Daily 

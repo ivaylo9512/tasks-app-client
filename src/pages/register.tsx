@@ -1,12 +1,9 @@
-import { RegisterDocument, RegisterMutation, RegisterMutationVariables, RegisterInput, FieldError } from '../generated/graphql';
-import { useState, FormEvent, useMemo, useRef, useEffect, MouseEvent } from 'react';
+import { RegisterDocument, RegisterMutation, RegisterMutationVariables, RegisterInput } from '../generated/graphql';
+import { useState, FormEvent, useMemo, useRef, MouseEvent } from 'react';
 import useInput from '../hooks/useInput';
-import { useQuery } from 'urql';
 import InputWithError from '../components/InputWithError';
 import Link from 'next/link';
 import validateEmail from '../helpers/validateEmail';
-import { withUrqlClient } from 'next-urql';
-import { createClient } from '../helpers/client';
 import useEffectInitial from '../hooks/useEffectInitital';
 import { useRouter } from 'next/router';
 

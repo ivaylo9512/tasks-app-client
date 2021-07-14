@@ -5,7 +5,7 @@ import TaskList from "./TaskList"
 const Section = styled.section`
     flex:1;
 `
-const TaskView = () => {
+const TaskView: React.FC = () => {
     return(
         <Section>
             <TaskList />

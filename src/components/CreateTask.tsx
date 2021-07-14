@@ -2,7 +2,7 @@ import useInput from "../hooks/useInput"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 
-const CreateTask = () => {
+const CreateTask: React.FC = () => {
     const [note, noteInput] = useInput({
         name: 'note',
         placeholder: 'note',

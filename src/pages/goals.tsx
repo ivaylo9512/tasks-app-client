@@ -8,7 +8,7 @@ const Goals = () => {
     flex-direction: column;
 
 `
-const Section = styled.section`
+const Section: React.FC = styled.section`
     height: 100%;
 `
     return(

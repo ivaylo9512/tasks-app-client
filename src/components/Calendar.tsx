@@ -53,7 +53,7 @@ type CalendarProps = {
     setDate: Dispatch<SetStateAction<Date>>
 }
 
-const CalendarView = ({locales = 'en', format = 'long', date, setDate} : CalendarProps) => {
+const Calendar: React.FC<CalendarProps> = ({locales = 'en', format = 'long', date, setDate} : CalendarProps) => {
     const [days, setDays] = useState<Map<string, Day>>(() => generateDays(date.getFullYear(), date.getMonth()));
 
     const monthNames = useMemo(() => getMonthNames(locales, format), [locales, format]);
@@ -76,7 +76,7 @@ const CalendarView = ({locales = 'en', format = 'long', date, setDate} : Calenda
         setDays(generateDays(date.getFullYear(), month))
     }
 
-    return(
+    return(<div>
         <Container>
             <Buttons>
                 <button onClick={() => setMonth(date.getMonth() - 1)}><FontAwesomeIcon icon={faCaretLeft} /></button>
@@ -93,9 +93,10 @@ const CalendarView = ({locales = 'en', format = 'long', date, setDate} : Calenda
                 )}
             </Days>
         </Container>
+        </div>
     )
 }
-export default CalendarView
+export default Calendar
 
 type Day = {
     date: Date,

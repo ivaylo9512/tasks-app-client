@@ -1,14 +1,13 @@
 import Header from "./Header"
 import { NextComponentType } from "next"
 import { ComponentClass } from "react"
-import Calendar from "./Calendar"
+import Calendar from "./CalendarView"
 
-const Layout = ({children} : any) => {
+const Layout: React.FC = ({children} : any) => {
 
 return(
     <div className="layout">
         <Header />
-        <Calendar></Calendar>
         {children}
     </div>
 )

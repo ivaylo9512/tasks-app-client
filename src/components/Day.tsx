@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, SetStateAction } from "react"
 import React from "react"
 import styled from "styled-components"
 
@@ -21,7 +21,12 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
 `
-const DayContainer = React.memo(({ day, hasEvent, setDate } : {day: number, hasEvent: boolean, setDate: () => void}) => {
+type DayProps = {
+    day: number;
+    hasEvent: boolean;
+    setDate: () => SetStateAction<Date>;
+}
+const Day: React.FC<DayProps> = React.memo(({ day, hasEvent, setDate }: DayProps) => {
     return(
         <Button onClick={setDate}>
             <Container>
@@ -31,4 +36,4 @@ const DayContainer = React.memo(({ day, hasEvent, setDate } : {day: number, hasE
         </Button>
     )
 })
-export default DayContainer
+export default Day

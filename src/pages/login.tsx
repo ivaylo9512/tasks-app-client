@@ -5,7 +5,7 @@ import { useQuery } from "urql";
 import { LoginDocument, LoginMutation, LoginMutationVariables, UserInput } from "../generated/graphql";
 import validateEmail from "../helpers/validateEmail";
 
-const Login = () => {
+const Login: React.FC = () => {
     const loginInput = useRef<UserInput>();
     const [userValues, {usernameOrEmailInput, passwordInput}] = useCreateInputs();
     const [loginValue, loginMut] = useQuery<LoginMutation, LoginMutationVariables>({ query: LoginDocument, pause: !loginInput.current, variables: loginInput.current, context: useMemo(() => ({ url: 'http://localhost:8056/graphql'}), [])})

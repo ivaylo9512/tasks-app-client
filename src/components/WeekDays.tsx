@@ -13,7 +13,7 @@ const Container = styled.div`
     background: #000000;
     position: relative;
 `
-const WeekDays = () => {
+const WeekDays: React.FC = () => {
     return(
         <>
         <Container>Mo</Container>

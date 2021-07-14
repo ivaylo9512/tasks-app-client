@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-const Nav = () => {
+const Nav: React.FC = () => {
     return (
         <nav>
             <ul>
