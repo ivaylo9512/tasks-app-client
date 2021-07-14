@@ -1,8 +1,9 @@
 import Day from "./Day"
 import WeekDays from "./WeekDays"
 import styled from "styled-components"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Task } from "../types"
+import { DateProvider } from "../pages/calendar-view"
 
 const Days = styled.div`
     display: flex;
@@ -20,17 +21,14 @@ type DaysContainerProps = {
     setDate: React.Dispatch<React.SetStateAction<Date>>
 }
 
-const DaysContainer: React.FC<DaysContainerProps> = ({ date, setDate }) => {
+const DaysContainer: React.FC = () => {
     const [days, setDays] = useState<Map<string, DayType>>(new Map());
-
-    useEffect(() => {
-        setDays(generateDays(date.getFullYear(), date.getMonth()));
-    }, [date]);
+    const {date, setDate} = useContext(DateProvider);
 
     return(
         <Days>
             <WeekDays />
-            {Array.from(days.values()).map(day =>
+            {Array.from(generateDays(date.getFullYear(), date.getMonth()).values()).map(day =>
                 <Day setDate={() => setDate(day.date)} key={day.date.toISOString()} day={day.date.getDate()} hasEvent={!!day.tasks && day.tasks.length > 0} />
             )}
         </Days>
