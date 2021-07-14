@@ -1,10 +1,9 @@
-import { useState, useMemo, ChangeEvent, Dispatch, SetStateAction } from "react"
-import Day from "./Day";
-import { Task } from "../types";
+import { useMemo, ChangeEvent, Dispatch, SetStateAction } from "react"
 import styled from 'styled-components';
 import WeekDays from "./WeekDays";
 import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import DaysContainer from "./DaysContainer";
 
 const Container = styled.div`
     width: 90%;
@@ -17,12 +16,6 @@ const Container = styled.div`
     button{
         font: bold 0.9vw Mukta;
     }
-`
-const Days = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    width: 80%;
-    border-radius: 2vw;
 `
 const Buttons = styled.div`
     display: flex;
@@ -53,8 +46,7 @@ type CalendarProps = {
     setDate: Dispatch<SetStateAction<Date>>
 }
 
-const Calendar: React.FC<CalendarProps> = ({locales = 'en', format = 'long', date, setDate} : CalendarProps) => {
-    const [days, setDays] = useState<Map<string, Day>>(() => generateDays(date.getFullYear(), date.getMonth()));
+const Calendar: React.FC<CalendarProps> = ({locales = 'en', format = 'long', date, setDate}) => {
 
     const monthNames = useMemo(() => getMonthNames(locales, format), [locales, format]);
     const setYear = ({ target: { value } } :  {target: HTMLInputElement }) => {
@@ -67,13 +59,11 @@ const Calendar: React.FC<CalendarProps> = ({locales = 'en', format = 'long', dat
         }
 
         setDate(newDate);
-        setDays(generateDays(Number(year), date.getMonth()));
     }
 
     const setMonth = (month: number) => {
         date.setMonth(month);
         setDate(new Date(date))
-        setDays(generateDays(date.getFullYear(), month))
     }
 
     return(<div>
@@ -86,55 +76,12 @@ const Calendar: React.FC<CalendarProps> = ({locales = 'en', format = 'long', dat
                 <button onClick={() => setMonth(date.getMonth() + 1)}><FontAwesomeIcon icon={faCaretRight} /></button>
                 <input value={date.getFullYear()} onChange={setYear}></input>
             </Buttons>
-            <Days>
-                <WeekDays />
-                {Array.from(days.values()).map(day =>
-                    <Day setDate={() => setDate(day.date)} key={day.date.toISOString()} day={day.date.getDate()} hasEvent={!!day.tasks && day.tasks.length > 0} />
-                )}
-            </Days>
+            <DaysContainer date={date} setDate={setDate}/>
         </Container>
         </div>
     )
 }
 export default Calendar
-
-type Day = {
-    date: Date,
-    className?: string,
-    tasks?: Task[]
-}
-
-const generateDays = (year: number, month: number) : Map<string, Day> => {
-    const [prevYear, prevMonth] = month == 0 ? [year - 1, 11] : [year, month - 1]; 
-    const [nextYear, nextMonth] = month == 11 ? [year + 1, 0] : [year, month + 1];
-
-    const monthDays = getDays(year, month + 1);
-    const maxDays = 42;
-
-    const prevDaysLength = new Date(year, month, 1).getDay();
-    const prevMonthDays = getDays(prevYear, prevMonth + 1);
-    const nextDaysLength = maxDays - prevDaysLength - monthDays;
-
-    const days = new Map();
-    Array.from({ length: prevDaysLength }).forEach((_, i) => pushDays(prevYear, prevMonth, (prevMonthDays - prevDaysLength) + i + 1, days));
-    Array.from({ length: monthDays }).forEach((_, i) => pushDays(year, month, i + 1, days));
-    Array.from({ length: nextDaysLength}).forEach((_, i) =>  pushDays(nextYear, nextMonth, i + 1, days, 'grey'));
-
-    return days;
-}
-const pushDays = (year: number, month: number, day: number, days:Map<string, Day>, className?: string) => {
-    const date = new Date(year, month, day);
-    const dayObj = { 
-        date, 
-        className: 'grey'
-    }
-    days.set(date.toISOString().split('T')[0], dayObj);
-}
-
-
-const getDays = (y: number, m : number) =>  {
-    return m===2 ? y & 3 || !(y % 25) && y & 15 ? 28 : 29 : 30 + (m +(m >> 3) & 1);
-}
 
 const getMonthNames = (locales: string, format: string) => {
     const formatter = new Intl.DateTimeFormat(locales, {
