@@ -16,12 +16,11 @@ type CalendarProps = {
     setDate: React.Dispatch<React.SetStateAction<Date>>;
 }
 
-const Calendar: React.FC<CalendarProps> = ({date, setDate}) => {
-
+const Calendar: React.FC<CalendarProps> = () => {
     return(
         <Section>
-            <CalendarHeader date={date} setDate={setDate}/>
-            <DaysContainer date={date} setDate={setDate}/>
+            <CalendarHeader />
+            <DaysContainer />
         </Section>
     )
 }

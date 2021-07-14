@@ -24,7 +24,7 @@ const Container = styled.div`
 type DayProps = {
     day: number;
     hasEvent: boolean;
-    setDate: () => SetStateAction<Date>;
+    setDate: () => void;
 }
 const Day: React.FC<DayProps> = React.memo(({ day, hasEvent, setDate }: DayProps) => {
     return(

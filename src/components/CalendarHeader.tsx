@@ -1,7 +1,8 @@
 import styled from "styled-components"
-import { useMemo } from "react"
+import { useMemo, useContext } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
+import { DateProvider } from "../pages/calendar-view"
 
 const Header = styled.header`
     display: flex;
@@ -30,11 +31,10 @@ const MonthContainer = styled.div`
 type CalendarProps = {
     locales?: string; 
     format?: 'long' | 'short'; 
-    date: Date;
-    setDate: React.Dispatch<React.SetStateAction<Date>>
 }
-const CalendarHeader: React.FC<CalendarProps> = ({ locales = 'en', format = 'long', date, setDate }) => {
-    const monthNames = useMemo(() => getMonthNames(locales, format), [locales, format]);
+const CalendarHeader: React.FC<CalendarProps> = ({ locales = 'en', format = 'long' }) => {
+    const monthNames = useMemo<string[]>(() => getMonthNames(locales, format), [locales, format]);
+    const {date, setDate} = useContext(DateProvider);
 
     const setMonth = (month: number) => {
         const newDate = new Date(date); 
