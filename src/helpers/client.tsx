@@ -1,10 +1,29 @@
 import { NextPageContext } from "next";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from '@apollo/client/link/context';
 
-export const createClient = (ctx: NextPageContext) =>
-  new ApolloClient({
-    uri: process.env.NEXT_PUBLIC_API_URL as string,
-    cache: new InMemoryCache({
-    
-    })
-  })
+const userServer = createHttpLink({
+  uri: 'http://localhost:8056/graphql',
+});
+const taskServer = createHttpLink({
+  uri: 'http://localhost:8099/graphql',
+});
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('Authorization');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
+export const createApolloClient = (ctx: NextPageContext) => new ApolloClient({
+    ssrMode: Boolean(ctx),
+    link: authLink.concat(userServer),
+    cache: new InMemoryCache()
+})
+export const createTaskClient = new ApolloClient({
+    link: authLink.concat(taskServer),
+    cache: new InMemoryCache()
+})
