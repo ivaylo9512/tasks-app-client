@@ -1,0 +1,9 @@
+fragment TaskFragment on Task {
+    id,
+    name,
+    alertAt,
+    eventDate,
+    from,
+    to,
+    state,
+}

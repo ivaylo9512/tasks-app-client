@@ -1,0 +1,15 @@
+query taskById($id: Int!){
+    taskById(id: $id){
+        ...TaskFragment
+    }
+}
+query tasksByDate($date: String!){
+    tasksByDate(date: $date){
+        ...TaskFragment
+    }
+}
+mutation createTask($taskInput: TaskInput!){
+    createTask(taskInput: $taskInput){
+        ...TaskFragment
+    }
+}
