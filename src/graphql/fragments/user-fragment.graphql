@@ -4,5 +4,6 @@ fragment UserFragment on User {
     firstName
     lastName
     age,
-    email
+    email,
+    role
 }
