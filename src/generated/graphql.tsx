@@ -26,6 +26,7 @@ export type FieldError = {
 export type Mutation = {
   __typename?: 'Mutation';
   createTask: Task;
+  delete: Scalars['Boolean'];
   deleteTask: Scalars['Boolean'];
   forgotPassword: UserResponse;
   login: UserResponse;
@@ -36,6 +37,11 @@ export type Mutation = {
 
 export type MutationCreateTaskArgs = {
   taskInput: TaskInput;
+};
+
+
+export type MutationDeleteArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -65,30 +71,30 @@ export type MutationUpdateTaskArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  findById: UserResponse;
-  getTask?: Maybe<Task>;
-  getTasksByDate: Array<Task>;
   getTasksByState: Array<Task>;
-};
-
-
-export type QueryFindByIdArgs = {
-  id: Scalars['Float'];
-};
-
-
-export type QueryGetTaskArgs = {
-  id: Scalars['Float'];
-};
-
-
-export type QueryGetTasksByDateArgs = {
-  date: Scalars['DateTime'];
+  taskById?: Maybe<Task>;
+  tasksByDate: Array<Task>;
+  userById: User;
 };
 
 
 export type QueryGetTasksByStateArgs = {
   state: Scalars['String'];
+};
+
+
+export type QueryTaskByIdArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryTasksByDateArgs = {
+  date: Scalars['String'];
+};
+
+
+export type QueryUserByIdArgs = {
+  id: Scalars['Int'];
 };
 
 export type RegisterInput = {
@@ -106,30 +112,33 @@ export type Task = {
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   name: Scalars['String'];
-  alertAt: Scalars['DateTime'];
-  eventDate: Scalars['DateTime'];
-  from: Scalars['DateTime'];
-  to: Scalars['DateTime'];
+  alertAt?: Maybe<Scalars['DateTime']>;
+  eventDate?: Maybe<Scalars['DateTime']>;
+  from?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
   state: Scalars['String'];
   owner: User;
 };
 
 export type TaskInput = {
-  id: Scalars['Float'];
-  from: Scalars['DateTime'];
-  to: Scalars['DateTime'];
-  daily: Scalars['Boolean'];
-  alertAt: Scalars['DateTime'];
+  id?: Maybe<Scalars['Float']>;
+  from?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
+  state: Scalars['String'];
+  alertAt?: Maybe<Scalars['DateTime']>;
+  name: Scalars['String'];
+  eventDate?: Maybe<Scalars['String']>;
 };
 
 export type User = {
   __typename?: 'User';
-  age: Scalars['String'];
+  age: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   firstName: Scalars['String'];
   id: Scalars['Int'];
   lastName: Scalars['String'];
+  role: Scalars['String'];
   tasks?: Maybe<Array<Task>>;
   updatedAt: Scalars['DateTime'];
   username: Scalars['String'];
@@ -147,9 +156,76 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type TaskFragmentFragment = (
+  { __typename?: 'Task' }
+  & Pick<Task, 'id' | 'name' | 'alertAt' | 'eventDate' | 'from' | 'to' | 'state'>
+);
+
 export type UserFragmentFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age' | 'email'>
+  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age' | 'email' | 'role'>
+);
+
+export type TaskByIdQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type TaskByIdQuery = (
+  { __typename?: 'Query' }
+  & { taskById?: Maybe<(
+    { __typename?: 'Task' }
+    & TaskFragmentFragment
+  )> }
+);
+
+export type TasksByDateQueryVariables = Exact<{
+  date: Scalars['String'];
+}>;
+
+
+export type TasksByDateQuery = (
+  { __typename?: 'Query' }
+  & { tasksByDate: Array<(
+    { __typename?: 'Task' }
+    & TaskFragmentFragment
+  )> }
+);
+
+export type CreateTaskMutationVariables = Exact<{
+  taskInput: TaskInput;
+}>;
+
+
+export type CreateTaskMutation = (
+  { __typename?: 'Mutation' }
+  & { createTask: (
+    { __typename?: 'Task' }
+    & TaskFragmentFragment
+  ) }
+);
+
+export type UserByIdQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type UserByIdQuery = (
+  { __typename?: 'Query' }
+  & { userById: (
+    { __typename?: 'User' }
+    & UserFragmentFragment
+  ) }
+);
+
+export type DeleteMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'delete'>
 );
 
 export type LoginMutationVariables = Exact<{
@@ -174,12 +250,7 @@ export type LoginMutation = (
 );
 
 export type RegisterMutationVariables = Exact<{
-  username: Scalars['String'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-  firstName: Scalars['String'];
-  lastName: Scalars['String'];
-  age: Scalars['DateTime'];
+  registerInput: RegisterInput;
 }>;
 
 
@@ -197,6 +268,17 @@ export type RegisterMutation = (
   ) }
 );
 
+export const TaskFragmentFragmentDoc = gql`
+    fragment TaskFragment on Task {
+  id
+  name
+  alertAt
+  eventDate
+  from
+  to
+  state
+}
+    `;
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -205,10 +287,180 @@ export const UserFragmentFragmentDoc = gql`
   lastName
   age
   email
+  role
 }
     `;
+export const TaskByIdDocument = gql`
+    query taskById($id: Int!) {
+  taskById(id: $id) {
+    ...TaskFragment
+  }
+}
+    ${TaskFragmentFragmentDoc}`;
+
+/**
+ * __useTaskByIdQuery__
+ *
+ * To run a query within a React component, call `useTaskByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTaskByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useTaskByIdQuery(baseOptions: Apollo.QueryHookOptions<TaskByIdQuery, TaskByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TaskByIdQuery, TaskByIdQueryVariables>(TaskByIdDocument, options);
+      }
+export function useTaskByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TaskByIdQuery, TaskByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TaskByIdQuery, TaskByIdQueryVariables>(TaskByIdDocument, options);
+        }
+export type TaskByIdQueryHookResult = ReturnType<typeof useTaskByIdQuery>;
+export type TaskByIdLazyQueryHookResult = ReturnType<typeof useTaskByIdLazyQuery>;
+export type TaskByIdQueryResult = Apollo.QueryResult<TaskByIdQuery, TaskByIdQueryVariables>;
+export const TasksByDateDocument = gql`
+    query tasksByDate($date: String!) {
+  tasksByDate(date: $date) {
+    ...TaskFragment
+  }
+}
+    ${TaskFragmentFragmentDoc}`;
+
+/**
+ * __useTasksByDateQuery__
+ *
+ * To run a query within a React component, call `useTasksByDateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTasksByDateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTasksByDateQuery({
+ *   variables: {
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useTasksByDateQuery(baseOptions: Apollo.QueryHookOptions<TasksByDateQuery, TasksByDateQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TasksByDateQuery, TasksByDateQueryVariables>(TasksByDateDocument, options);
+      }
+export function useTasksByDateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TasksByDateQuery, TasksByDateQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TasksByDateQuery, TasksByDateQueryVariables>(TasksByDateDocument, options);
+        }
+export type TasksByDateQueryHookResult = ReturnType<typeof useTasksByDateQuery>;
+export type TasksByDateLazyQueryHookResult = ReturnType<typeof useTasksByDateLazyQuery>;
+export type TasksByDateQueryResult = Apollo.QueryResult<TasksByDateQuery, TasksByDateQueryVariables>;
+export const CreateTaskDocument = gql`
+    mutation createTask($taskInput: TaskInput!) {
+  createTask(taskInput: $taskInput) {
+    ...TaskFragment
+  }
+}
+    ${TaskFragmentFragmentDoc}`;
+export type CreateTaskMutationFn = Apollo.MutationFunction<CreateTaskMutation, CreateTaskMutationVariables>;
+
+/**
+ * __useCreateTaskMutation__
+ *
+ * To run a mutation, you first call `useCreateTaskMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTaskMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTaskMutation, { data, loading, error }] = useCreateTaskMutation({
+ *   variables: {
+ *      taskInput: // value for 'taskInput'
+ *   },
+ * });
+ */
+export function useCreateTaskMutation(baseOptions?: Apollo.MutationHookOptions<CreateTaskMutation, CreateTaskMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, options);
+      }
+export type CreateTaskMutationHookResult = ReturnType<typeof useCreateTaskMutation>;
+export type CreateTaskMutationResult = Apollo.MutationResult<CreateTaskMutation>;
+export type CreateTaskMutationOptions = Apollo.BaseMutationOptions<CreateTaskMutation, CreateTaskMutationVariables>;
+export const UserByIdDocument = gql`
+    query userById($id: Int!) {
+  userById(id: $id) {
+    ...UserFragment
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+/**
+ * __useUserByIdQuery__
+ *
+ * To run a query within a React component, call `useUserByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUserByIdQuery(baseOptions: Apollo.QueryHookOptions<UserByIdQuery, UserByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserByIdQuery, UserByIdQueryVariables>(UserByIdDocument, options);
+      }
+export function useUserByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserByIdQuery, UserByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserByIdQuery, UserByIdQueryVariables>(UserByIdDocument, options);
+        }
+export type UserByIdQueryHookResult = ReturnType<typeof useUserByIdQuery>;
+export type UserByIdLazyQueryHookResult = ReturnType<typeof useUserByIdLazyQuery>;
+export type UserByIdQueryResult = Apollo.QueryResult<UserByIdQuery, UserByIdQueryVariables>;
+export const DeleteDocument = gql`
+    mutation delete($id: Int!) {
+  delete(id: $id)
+}
+    `;
+export type DeleteMutationFn = Apollo.MutationFunction<DeleteMutation, DeleteMutationVariables>;
+
+/**
+ * __useDeleteMutation__
+ *
+ * To run a mutation, you first call `useDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMutation, { data, loading, error }] = useDeleteMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMutation, DeleteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteMutation, DeleteMutationVariables>(DeleteDocument, options);
+      }
+export type DeleteMutationHookResult = ReturnType<typeof useDeleteMutation>;
+export type DeleteMutationResult = Apollo.MutationResult<DeleteMutation>;
+export type DeleteMutationOptions = Apollo.BaseMutationOptions<DeleteMutation, DeleteMutationVariables>;
 export const LoginDocument = gql`
-    mutation Login($username: String, $email: String, $password: String!) {
+    mutation login($username: String, $email: String, $password: String!) {
   login(userInput: {username: $username, password: $password, email: $email}) {
     errors {
       field
@@ -249,10 +501,8 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $email: String!, $password: String!, $firstName: String!, $lastName: String!, $age: DateTime!) {
-  register(
-    registerInput: {username: $username, password: $password, firstName: $firstName, lastName: $lastName, age: $age, email: $email}
-  ) {
+    mutation register($registerInput: RegisterInput!) {
+  register(registerInput: $registerInput) {
     errors {
       field
       message
@@ -278,12 +528,7 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  * @example
  * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
- *      username: // value for 'username'
- *      email: // value for 'email'
- *      password: // value for 'password'
- *      firstName: // value for 'firstName'
- *      lastName: // value for 'lastName'
- *      age: // value for 'age'
+ *      registerInput: // value for 'registerInput'
  *   },
  * });
  */

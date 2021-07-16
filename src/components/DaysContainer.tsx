@@ -16,13 +16,8 @@ type DayType = {
     className?: string,
     tasks?: Task[]
 }
-type DaysContainerProps = {
-    date: Date,
-    setDate: React.Dispatch<React.SetStateAction<Date>>
-}
 
 const DaysContainer: React.FC = () => {
-    const [days, setDays] = useState<Map<string, DayType>>(new Map());
     const {date, setDate} = useContext(DateProvider);
 
     return(

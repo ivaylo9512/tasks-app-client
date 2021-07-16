@@ -20,10 +20,10 @@ const authLink = setContext((_, { headers }) => {
 
 export const createApolloClient = (ctx: NextPageContext) => new ApolloClient({
     ssrMode: Boolean(ctx),
-    link: authLink.concat(userServer),
-    cache: new InMemoryCache()
-})
-export const createTaskClient = new ApolloClient({
     link: authLink.concat(taskServer),
+    cache: new InMemoryCache(),
+})
+export const createUserClient = new ApolloClient({
+    link: authLink.concat(userServer),
     cache: new InMemoryCache()
 })
