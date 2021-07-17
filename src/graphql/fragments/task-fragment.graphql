@@ -1,4 +1,4 @@
-fragment TaskFragment on Task {
+fragment Task on Task {
     id,
     name,
     alertAt,

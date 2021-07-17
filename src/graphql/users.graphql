@@ -1,6 +1,6 @@
 query userById($id: Int!){
   userById(id: $id) {
-    ...UserFragment
+    ...User
   }
 }
 
@@ -19,7 +19,7 @@ mutation login($username: String, $email: String, $password: String!){
             message
         }
         user {
-            ...UserFragment
+            ...User
         }
     }
 }
@@ -31,7 +31,7 @@ mutation register($registerInput: RegisterInput!){
             message
         }
         user {
-            ...UserFragment
+            ...User
         }
     }
 }

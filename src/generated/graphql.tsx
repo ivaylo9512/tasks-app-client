@@ -14,7 +14,10 @@ export type Scalars = {
   Float: number;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
+  /** DateType object date scalar type */
+  DateType: any;
 };
+
 
 
 export type FieldError = {
@@ -113,7 +116,7 @@ export type Task = {
   updatedAt: Scalars['DateTime'];
   name: Scalars['String'];
   alertAt?: Maybe<Scalars['DateTime']>;
-  eventDate?: Maybe<Scalars['DateTime']>;
+  eventDate?: Maybe<Scalars['DateType']>;
   from?: Maybe<Scalars['String']>;
   to?: Maybe<Scalars['String']>;
   state: Scalars['String'];
@@ -156,12 +159,12 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
-export type TaskFragmentFragment = (
+export type TaskFragment = (
   { __typename?: 'Task' }
   & Pick<Task, 'id' | 'name' | 'alertAt' | 'eventDate' | 'from' | 'to' | 'state'>
 );
 
-export type UserFragmentFragment = (
+export type UserFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age' | 'email' | 'role'>
 );
@@ -175,7 +178,7 @@ export type TaskByIdQuery = (
   { __typename?: 'Query' }
   & { taskById?: Maybe<(
     { __typename?: 'Task' }
-    & TaskFragmentFragment
+    & TaskFragment
   )> }
 );
 
@@ -188,7 +191,7 @@ export type TasksByDateQuery = (
   { __typename?: 'Query' }
   & { tasksByDate: Array<(
     { __typename?: 'Task' }
-    & TaskFragmentFragment
+    & TaskFragment
   )> }
 );
 
@@ -201,7 +204,7 @@ export type CreateTaskMutation = (
   { __typename?: 'Mutation' }
   & { createTask: (
     { __typename?: 'Task' }
-    & TaskFragmentFragment
+    & TaskFragment
   ) }
 );
 
@@ -214,7 +217,7 @@ export type UserByIdQuery = (
   { __typename?: 'Query' }
   & { userById: (
     { __typename?: 'User' }
-    & UserFragmentFragment
+    & UserFragment
   ) }
 );
 
@@ -244,7 +247,7 @@ export type LoginMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & UserFragmentFragment
+      & UserFragment
     )> }
   ) }
 );
@@ -263,13 +266,13 @@ export type RegisterMutation = (
       & Pick<FieldError, 'field' | 'message'>
     )>>, user?: Maybe<(
       { __typename?: 'User' }
-      & UserFragmentFragment
+      & UserFragment
     )> }
   ) }
 );
 
-export const TaskFragmentFragmentDoc = gql`
-    fragment TaskFragment on Task {
+export const TaskFragmentDoc = gql`
+    fragment Task on Task {
   id
   name
   alertAt
@@ -279,8 +282,8 @@ export const TaskFragmentFragmentDoc = gql`
   state
 }
     `;
-export const UserFragmentFragmentDoc = gql`
-    fragment UserFragment on User {
+export const UserFragmentDoc = gql`
+    fragment User on User {
   id
   username
   firstName
@@ -293,10 +296,10 @@ export const UserFragmentFragmentDoc = gql`
 export const TaskByIdDocument = gql`
     query taskById($id: Int!) {
   taskById(id: $id) {
-    ...TaskFragment
+    ...Task
   }
 }
-    ${TaskFragmentFragmentDoc}`;
+    ${TaskFragmentDoc}`;
 
 /**
  * __useTaskByIdQuery__
@@ -328,10 +331,10 @@ export type TaskByIdQueryResult = Apollo.QueryResult<TaskByIdQuery, TaskByIdQuer
 export const TasksByDateDocument = gql`
     query tasksByDate($date: String!) {
   tasksByDate(date: $date) {
-    ...TaskFragment
+    ...Task
   }
 }
-    ${TaskFragmentFragmentDoc}`;
+    ${TaskFragmentDoc}`;
 
 /**
  * __useTasksByDateQuery__
@@ -363,10 +366,10 @@ export type TasksByDateQueryResult = Apollo.QueryResult<TasksByDateQuery, TasksB
 export const CreateTaskDocument = gql`
     mutation createTask($taskInput: TaskInput!) {
   createTask(taskInput: $taskInput) {
-    ...TaskFragment
+    ...Task
   }
 }
-    ${TaskFragmentFragmentDoc}`;
+    ${TaskFragmentDoc}`;
 export type CreateTaskMutationFn = Apollo.MutationFunction<CreateTaskMutation, CreateTaskMutationVariables>;
 
 /**
@@ -396,10 +399,10 @@ export type CreateTaskMutationOptions = Apollo.BaseMutationOptions<CreateTaskMut
 export const UserByIdDocument = gql`
     query userById($id: Int!) {
   userById(id: $id) {
-    ...UserFragment
+    ...User
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    ${UserFragmentDoc}`;
 
 /**
  * __useUserByIdQuery__
@@ -467,11 +470,11 @@ export const LoginDocument = gql`
       message
     }
     user {
-      ...UserFragment
+      ...User
     }
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    ${UserFragmentDoc}`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -508,11 +511,11 @@ export const RegisterDocument = gql`
       message
     }
     user {
-      ...UserFragment
+      ...User
     }
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    ${UserFragmentDoc}`;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
