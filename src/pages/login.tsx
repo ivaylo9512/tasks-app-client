@@ -23,7 +23,7 @@ const Login: React.FC = () => {
             variables
         })
     }
-    
+
     return (
         <section>
             <form onSubmit={login}>

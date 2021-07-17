@@ -1,4 +1,4 @@
-import { RegisterDocument, RegisterMutation, RegisterMutationVariables, RegisterInput } from '../generated/graphql';
+import { useRegisterMutation } from '../generated/graphql';
 import { useState, FormEvent, useMemo, useRef, MouseEvent } from 'react';
 import useInput from '../hooks/useInput';
 import InputWithError from '../components/InputWithError';
@@ -6,11 +6,13 @@ import Link from 'next/link';
 import validateEmail from '../helpers/validateEmail';
 import useEffectInitial from '../hooks/useEffectInitital';
 import { useRouter } from 'next/router';
+import { userClient } from '../helpers/client';
 
 const Register: React.FC = () => {
     const [registerValues, { usernameInput, passwordInput, repeatPasswordInput, ageInput, emailInput, firstNameInput, lastNameInput }] = useCreateFields(); 
-    const registerRef = useRef<RegisterInput>()
-    const [registerUser, registerMut] = useQuery<RegisterMutation, RegisterMutationVariables>({ query: RegisterDocument, pause: !registerRef.current, variables: registerRef.current, context: useMemo(() => ({url: 'http://localhost:8056/graphql'}), [])});
+    const [registerMut, { data: registerUser }] = useRegisterMutation({
+        client: userClient
+    }) 
     const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
     const [pageCount, setPageCount] = useState(0);
     const router = useRouter();
@@ -22,18 +24,20 @@ const Register: React.FC = () => {
             return;
         }
         const {repeatPassword, ...registerObject} = registerValues;
-        registerObject.age = new Date(registerObject.age); 
 
-        registerRef.current = registerObject
-        registerMut();
+        registerMut({
+            variables: {
+                registerInput: registerObject
+            }
+        });
     }
 
     useEffectInitial(() => {
-        if(registerUser.fetching){
+        if(!registerUser){
             return;
         }
 
-        const errors = registerUser.data?.register.errors;
+        const errors = registerUser.register.errors;
         const errorObject = errors?.reduce((obj: {[name: string] : string}, err) =>(obj[err.field] = err.message, obj), {});
 
         if(!errorObject){
@@ -75,7 +79,7 @@ const Register: React.FC = () => {
         </section>
     )
 }
-export default withUrqlClient(createClient)(Register)
+export default Register
 
 type Inputs = {
     usernameInput: JSX.Element 
