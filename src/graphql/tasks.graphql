@@ -8,8 +8,21 @@ query tasksByDate($date: String!){
         ...Task
     }
 }
+query tasksByState($state: String!){
+    tasksByState(state: $state){
+        ...Task
+    }
+}
 mutation createTask($taskInput: TaskInput!){
     createTask(taskInput: $taskInput){
         ...Task
     }
+}
+mutation updateTask($taskInput: TaskInput!){
+    updateTask(taskInput: $taskInput){
+        ...Task
+    }
+}
+mutation deleteTask($id: Int!){
+    deleteTask(id: $id)
 }
