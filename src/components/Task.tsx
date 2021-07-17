@@ -1,5 +1,7 @@
 import { TaskFragment } from "../generated/graphql"
 import styled from "styled-components"
+import { memo } from "react"
+import { useRouter } from 'next/router'
 
 type TaskProps = {
     task: TaskFragment
@@ -28,13 +30,24 @@ const Container = styled.div`
     }
 ` 
 
-const Task: React.FC<TaskProps> = ({ task }) => {
+const Task: React.FC<TaskProps> = memo(({ task }) => {
+    const { route } = useRouter();
+
     return(
         <Container>
             <input value={task.name} />
-            <input type='time' value={task.from || '00:00'} />
-            <input type='time' value={task.to || '00:00'} />
+            {route != 'goals' &&
+                <>
+                    <input type='time' value={task.from || '00:00'} />
+                    <input type='time' value={task.to || '00:00'} />
+                </>
+            }
+            {route == 'daily' && 
+                <>
+                    <input type='radio'/>
+                </>
+            }
         </Container>
     )
-}
+})
 export default Task
