@@ -23,11 +23,52 @@ const Container = styled.div`
 
 const CreateTask: React.FC = () => {
     const {route} = useRouter();
-    const [values, {nameInput, timeInput, alertAtInput}] = createInputs();
+    const [{name, time, alertAt}, {nameInput, timeInput, alertAtInput}] = createInputs();
     const [isAlertAtView, setIsAlertAtView] = useState<boolean>(false);
     
+    const [post] = useCreateTaskMutation({
+        update: (cache, { data: task }) => {
+            if(!task){
+                return;
+            }
+
+            const tasks = cache.readQuery<TasksByDateQuery>({ query: TasksByDateDocument, variables: {
+                date: task?.createTask.eventDate
+            }})?.tasksByDate || [];
+
+            cache.writeQuery<TasksByDateQuery>({
+                query: TasksByDateDocument,
+                data: {
+                    __typename: "Query",
+                    tasksByDate: [...tasks, task.createTask]
+                },
+                variables:{
+                    date: task.createTask.eventDate                
+                }
+            });
+          }
+    }); 
+
     const setView = () => {
         setIsAlertAtView(!isAlertAtView);
+    }
+
+    const addTask = () => {
+        let state = route;
+        if(route == 'create-view'){
+            state = 'event'
+        }
+        const task = {
+            alerAt: new Date(`${alertAt} ${time}`),
+            name,
+            state
+        }
+
+        post({
+            variables:{
+                taskInput: task
+            }
+        })
     }
 
     return(
@@ -38,8 +79,8 @@ const CreateTask: React.FC = () => {
                 <button onClick={setView}>back</button>
             </> : <>
                 {nameInput}
-                <button>add</button>
-                {route == 'calendar-view' && 
+                <button onClick={addTask}>add</button>
+                {route == '/calendar-view' && 
                     <button onClick={setView}>
                         <FontAwesomeIcon icon={faBell} />
                     </button>
@@ -71,6 +112,7 @@ const createInputs = (): [Values, Inputs] => {
     })
     const [alertAt, alertAtInput] = useInput({
         name: 'alertAt',
+        initialValue: new Date().toISOString().split('T')[0],
         type: 'date'
     })
 
