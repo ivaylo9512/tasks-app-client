@@ -20,26 +20,46 @@ export type Scalars = {
 
 
 
-export type FieldError = {
-  __typename?: 'FieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+export type LoginInput = {
+  username?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  password: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createMany: Array<User>;
   createTask: Task;
+  createTasks: Array<Task>;
+  createUsers: Array<User>;
   delete: Scalars['Boolean'];
   deleteTask: Scalars['Boolean'];
-  forgotPassword: UserResponse;
-  login: UserResponse;
-  register: UserResponse;
+  deleteUser: Scalars['Boolean'];
+  forgotPassword: User;
+  login: User;
+  register: User;
+  update: User;
   updateTask: Task;
+};
+
+
+export type MutationCreateManyArgs = {
+  users: Array<RegisterInput>;
 };
 
 
 export type MutationCreateTaskArgs = {
   taskInput: TaskInput;
+};
+
+
+export type MutationCreateTasksArgs = {
+  taskInputs: Array<TaskInput>;
+};
+
+
+export type MutationCreateUsersArgs = {
+  users: Array<UserInput>;
 };
 
 
@@ -53,13 +73,18 @@ export type MutationDeleteTaskArgs = {
 };
 
 
+export type MutationDeleteUserArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
 };
 
 
 export type MutationLoginArgs = {
-  userInput: UserInput;
+  loginInput: LoginInput;
 };
 
 
@@ -68,8 +93,13 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationUpdateArgs = {
+  updateInput: UpdateInput;
+};
+
+
 export type MutationUpdateTaskArgs = {
-  taskInput: TaskInput;
+  updateInput: UpdateInput;
 };
 
 export type Query = {
@@ -78,6 +108,7 @@ export type Query = {
   tasksByDate: Array<Task>;
   tasksByState: Array<Task>;
   userById: User;
+  userByUsername: User;
 };
 
 
@@ -100,13 +131,19 @@ export type QueryUserByIdArgs = {
   id: Scalars['Int'];
 };
 
+
+export type QueryUserByUsernameArgs = {
+  username: Scalars['String'];
+};
+
 export type RegisterInput = {
   username: Scalars['String'];
   password: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   email: Scalars['String'];
-  age: Scalars['DateTime'];
+  age: Scalars['Float'];
+  role: Scalars['String'];
 };
 
 export type Task = {
@@ -124,13 +161,29 @@ export type Task = {
 };
 
 export type TaskInput = {
-  id?: Maybe<Scalars['Float']>;
+  name: Scalars['String'];
+  state: Scalars['String'];
   from?: Maybe<Scalars['String']>;
   to?: Maybe<Scalars['String']>;
-  state: Scalars['String'];
-  alertAt?: Maybe<Scalars['DateTime']>;
-  name: Scalars['String'];
+  alertAt?: Maybe<Scalars['String']>;
   eventDate?: Maybe<Scalars['String']>;
+  owner?: Maybe<Scalars['Float']>;
+};
+
+export type UpdateInput = {
+  age: Scalars['Float'];
+  alertAt?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  eventDate?: Maybe<Scalars['String']>;
+  firstName: Scalars['String'];
+  from?: Maybe<Scalars['String']>;
+  id: Scalars['Float'];
+  lastName: Scalars['String'];
+  name: Scalars['String'];
+  role: Scalars['String'];
+  state: Scalars['String'];
+  to?: Maybe<Scalars['String']>;
+  username: Scalars['String'];
 };
 
 export type User = {
@@ -148,15 +201,8 @@ export type User = {
 };
 
 export type UserInput = {
-  username?: Maybe<Scalars['String']>;
-  email?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
-};
-
-export type UserResponse = {
-  __typename?: 'UserResponse';
-  errors?: Maybe<Array<FieldError>>;
-  user?: Maybe<User>;
+  id: Scalars['Float'];
+  role: Scalars['String'];
 };
 
 export type TaskFragment = (
@@ -222,7 +268,7 @@ export type CreateTaskMutation = (
 );
 
 export type UpdateTaskMutationVariables = Exact<{
-  taskInput: TaskInput;
+  updateInput: UpdateInput;
 }>;
 
 
@@ -268,23 +314,15 @@ export type DeleteMutation = (
 );
 
 export type LoginMutationVariables = Exact<{
-  username?: Maybe<Scalars['String']>;
-  email?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
+  loginInput: LoginInput;
 }>;
 
 
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'UserResponse' }
-    & { errors?: Maybe<Array<(
-      { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
-    )>>, user?: Maybe<(
-      { __typename?: 'User' }
-      & UserFragment
-    )> }
+    { __typename?: 'User' }
+    & UserFragment
   ) }
 );
 
@@ -296,14 +334,8 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
-    { __typename?: 'UserResponse' }
-    & { errors?: Maybe<Array<(
-      { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
-    )>>, user?: Maybe<(
-      { __typename?: 'User' }
-      & UserFragment
-    )> }
+    { __typename?: 'User' }
+    & UserFragment
   ) }
 );
 
@@ -468,8 +500,8 @@ export type CreateTaskMutationHookResult = ReturnType<typeof useCreateTaskMutati
 export type CreateTaskMutationResult = Apollo.MutationResult<CreateTaskMutation>;
 export type CreateTaskMutationOptions = Apollo.BaseMutationOptions<CreateTaskMutation, CreateTaskMutationVariables>;
 export const UpdateTaskDocument = gql`
-    mutation updateTask($taskInput: TaskInput!) {
-  updateTask(taskInput: $taskInput) {
+    mutation updateTask($updateInput: UpdateInput!) {
+  updateTask(updateInput: $updateInput) {
     ...Task
   }
 }
@@ -489,7 +521,7 @@ export type UpdateTaskMutationFn = Apollo.MutationFunction<UpdateTaskMutation, U
  * @example
  * const [updateTaskMutation, { data, loading, error }] = useUpdateTaskMutation({
  *   variables: {
- *      taskInput: // value for 'taskInput'
+ *      updateInput: // value for 'updateInput'
  *   },
  * });
  */
@@ -598,15 +630,9 @@ export type DeleteMutationHookResult = ReturnType<typeof useDeleteMutation>;
 export type DeleteMutationResult = Apollo.MutationResult<DeleteMutation>;
 export type DeleteMutationOptions = Apollo.BaseMutationOptions<DeleteMutation, DeleteMutationVariables>;
 export const LoginDocument = gql`
-    mutation login($username: String, $email: String, $password: String!) {
-  login(userInput: {username: $username, password: $password, email: $email}) {
-    errors {
-      field
-      message
-    }
-    user {
-      ...User
-    }
+    mutation login($loginInput: LoginInput!) {
+  login(loginInput: $loginInput) {
+    ...User
   }
 }
     ${UserFragmentDoc}`;
@@ -625,9 +651,7 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  * @example
  * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
- *      username: // value for 'username'
- *      email: // value for 'email'
- *      password: // value for 'password'
+ *      loginInput: // value for 'loginInput'
  *   },
  * });
  */
@@ -641,13 +665,7 @@ export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, Log
 export const RegisterDocument = gql`
     mutation register($registerInput: RegisterInput!) {
   register(registerInput: $registerInput) {
-    errors {
-      field
-      message
-    }
-    user {
-      ...User
-    }
+    ...User
   }
 }
     ${UserFragmentDoc}`;

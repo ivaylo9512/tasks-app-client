@@ -18,8 +18,8 @@ mutation createTask($taskInput: TaskInput!){
         ...Task
     }
 }
-mutation updateTask($taskInput: TaskInput!){
-    updateTask(taskInput: $taskInput){
+mutation updateTask($updateInput: UpdateInput!){
+    updateTask(updateInput: $updateInput){
         ...Task
     }
 }

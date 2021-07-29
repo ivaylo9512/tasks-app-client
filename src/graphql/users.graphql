@@ -1,37 +1,21 @@
 query userById($id: Int!){
-  userById(id: $id) {
-    ...User
-  }
+    userById(id: $id) {
+        ...User
+    }
 }
 
 mutation delete($id: Int!){
-  delete(id: $id)
+     delete(id: $id)
 }
 
-mutation login($username: String, $email: String, $password: String!){
-    login(userInput: {
-        username: $username, 
-        password: $password,
-        email: $email,
-    }) {
-        errors{
-            field
-            message
-        }
-        user {
-            ...User
-        }
+mutation login($loginInput: LoginInput!){
+    login(loginInput: $loginInput) {
+        ...User
     }
 }
 
 mutation register($registerInput: RegisterInput!){
     register(registerInput: $registerInput) {
-        errors {
-            field
-            message
-        }
-        user {
-            ...User
-        }
+        ...User
     }
 }
