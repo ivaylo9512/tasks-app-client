@@ -1,5 +1,5 @@
 import { useRegisterMutation } from '../generated/graphql';
-import { useState, FormEvent, useMemo, useRef, MouseEvent } from 'react';
+import { useState, FormEvent, MouseEvent } from 'react';
 import useInput from '../hooks/useInput';
 import InputWithError from '../components/InputWithError';
 import Link from 'next/link';
@@ -9,48 +9,41 @@ import { useRouter } from 'next/router';
 import { userClient } from '../helpers/client';
 
 const Register: React.FC = () => {
-    const [registerValues, { usernameInput, passwordInput, repeatPasswordInput, ageInput, emailInput, firstNameInput, lastNameInput }] = useCreateFields(); 
+    const [registerValues, { usernameInput, passwordInput, repeatPasswordInput, birthInput, emailInput, firstNameInput, lastNameInput }] = useCreateFields(); 
+    const [error, setError] = useState<RegisterError>({});
+
     const [registerMut, { data: registerUser }] = useRegisterMutation({
-        client: userClient
+        client: userClient,
+        errorPolicy: 'all'
     }) 
-    const [errors, setErrors] = useState<{[name: string]: string} | undefined>();
     const [pageCount, setPageCount] = useState(0);
     const router = useRouter();
 
     const register = async (e: FormEvent) => {
         e.preventDefault();
         if(!validateEmail(registerValues.email)){
-            setErrors({ email: 'Invalid email' });
+            setError({ email: 'Invalid email' });
             return;
         }
         const {repeatPassword, ...registerObject} = registerValues;
 
-        registerMut({
+        const res = await registerMut({
             variables: {
-                registerInput: registerObject
+                registerInput: {
+                    ...registerObject
+                }
             }
         });
+
+        setError(res.errors?.[0].extensions || {});
     }
 
     useEffectInitial(() => {
-        if(!registerUser){
-            return;
-        }
-
-        const errors = registerUser.register.errors;
-        const errorObject = errors?.reduce((obj: {[name: string] : string}, err) =>(obj[err.field] = err.message, obj), {});
-
-        if(!errorObject){
-            router.push('/');
-            return;
-        }
-
-        const { username, email, password, repeatPassword } = errorObject;
-        if(username || email || password || repeatPassword){
+        const { username, password, email } = error; 
+        if(username || email || password){
             setPageCount(0);
         }
-        setErrors(errorObject);
-    },[registerUser])
+    }, [error])
 
     const changePage = (event : MouseEvent<HTMLElement> | FormEvent) => {
         event?.preventDefault();
@@ -61,17 +54,17 @@ const Register: React.FC = () => {
         <section>
             {pageCount == 0 ?
                 <form onSubmit={changePage}>
-                    <InputWithError input={usernameInput} error={errors?.username}  />
-                    <InputWithError input={emailInput} error={errors?.email} />      
-                    <InputWithError input={passwordInput} error={errors?.password} />
+                    <InputWithError input={usernameInput} error={error.username}  />
+                    <InputWithError input={emailInput} error={error.email} />      
+                    <InputWithError input={passwordInput} error={error.password} />
                     <InputWithError input={repeatPasswordInput} />      
                     <button data-page='1'>next</button>
                     <span>Already have an account?<Link href='/login'> Sign in.</Link></span>
                 </form>  :
                 <form onSubmit={register}>
-                    <InputWithError input={firstNameInput} error={errors?.firstName} />
-                    <InputWithError input={lastNameInput} error={errors?.lastName} />
-                    <InputWithError input={ageInput} error={errors?.age} />
+                    <InputWithError input={firstNameInput} error={error.firstName} />
+                    <InputWithError input={lastNameInput} error={error.lastName} />
+                    <InputWithError input={birthInput} error={error.age} />
                     <button onClick={changePage} >prev</button>
                     <button type='submit'>register</button>
                 </form>
@@ -81,6 +74,16 @@ const Register: React.FC = () => {
 }
 export default Register
 
+type RegisterError = {
+    username?: string,
+    email?: string,
+    password?: string,
+    birth?: string,
+    firstName?: string,
+    lastName?: string,
+    age?: string
+}
+
 type Inputs = {
     usernameInput: JSX.Element 
     passwordInput: JSX.Element 
@@ -88,7 +91,7 @@ type Inputs = {
     firstNameInput: JSX.Element 
     lastNameInput: JSX.Element 
     emailInput: JSX.Element 
-    ageInput: JSX.Element 
+    birthInput: JSX.Element 
 }
 type Values = {
     username: string 
@@ -97,7 +100,7 @@ type Values = {
     firstName: string 
     lastName: string 
     email: string 
-    age: string | Date 
+    birth: string
 }
 const useCreateFields = (): [Values, Inputs] => {
     const [username, usernameInput] = useInput({
@@ -106,8 +109,8 @@ const useCreateFields = (): [Values, Inputs] => {
         autoComplete: 'username',
         validationRules: {
             required: true, 
-            minLength: 9, 
-            maxLength: 15}
+            minLength: 8, 
+            maxLength: 20}
         },
     )
 
@@ -118,7 +121,7 @@ const useCreateFields = (): [Values, Inputs] => {
         placeholder: 'password',
         validationRules: {
             minLength: 10,
-            maxLength: 25,
+            maxLength: 22,
             required: true
         }
     })
@@ -151,9 +154,9 @@ const useCreateFields = (): [Values, Inputs] => {
         } 
     })
 
-    const [age, ageInput] = useInput({
+    const [birth, birthInput] = useInput({
         type: 'date',
-        name: 'age', 
+        name: 'birth', 
         validationRules:{
             required: true,
             min: '1890-01-01',
@@ -167,5 +170,5 @@ const useCreateFields = (): [Values, Inputs] => {
         name: 'email',
         autoComplete: 'email'
     })
-    return [{username, password, repeatPassword, firstName, lastName, email, age}, {usernameInput, passwordInput, repeatPasswordInput, firstNameInput, lastNameInput, emailInput, ageInput}]
+    return [{username, password, repeatPassword, firstName, lastName, email, birth}, {usernameInput, passwordInput, repeatPasswordInput, firstNameInput, lastNameInput, emailInput, birthInput}]
 }   
