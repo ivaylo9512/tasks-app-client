@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import TaskView from '../components/TasksView';
-import { useTasksByStateQuery } from '../generated/graphql'
+import { useTasksByStateQuery, TasksByStateQuery } from '../generated/graphql'
+import { globalApolloClient } from '../helpers/create-with-apollo';
+import { TasksDocument } from '../graphql/cache-queries';
 
 const Container = styled.div`
     height: 100%;
@@ -13,16 +15,28 @@ const Section = styled.section`
 `
 
 const Daily: React.FC = () => {
-    const {data: tasks, loading, error} = useTasksByStateQuery({
+    const updateCache = (data: TasksByStateQuery) => {
+        globalApolloClient!.writeQuery({
+            query: TasksDocument,
+            data: {
+            __typename: "tasks",
+            tasks: data.tasksByState,
+            },
+        });
+    }
+
+    const {loading} = useTasksByStateQuery({
         variables: {
             state: 'daily'
         },
         notifyOnNetworkStatusChange: true,
+        onCompleted: updateCache
     }) 
+
     return(
         <Section>
             <Container>
-                <TaskView tasks={tasks?.tasksByState}/>
+                <TaskView />
             </Container>
         </Section>
     )

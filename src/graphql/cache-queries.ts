@@ -10,7 +10,7 @@ query tasks {
 
 export type TasksQuery = (
     { __typename?: 'Query' }
-    & { tasksByDate: Array<(
+    & { tasks: Array<(
       { __typename?: 'Tasks' }
       & TaskFragment
     )> }
@@ -25,7 +25,7 @@ query user {
 
 export type UserQuery = (
     { __typename?: 'Query' }
-    & { userById: (
+    & { user: (
       { __typename?: 'User' }
       & UserFragment
     ) }

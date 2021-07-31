@@ -35,13 +35,13 @@ type TaskViewProps = {
     isHidden: boolean
 }
 const TaskView: React.FC<TaskViewProps> = () => {
-    const {data: tasks, error} = useQuery<TasksQuery>(TasksDocument, {
+    const {data, error} = useQuery<TasksQuery>(TasksDocument, {
         fetchPolicy: 'cache-only',
     });
 
     return(
         <Section>
-            {tasks?.tasksByDate.length == 0 ? 
+            {!data?.tasks.length ? 
                 <TaskInfo>No tasks for selected date.</TaskInfo>
                 :
                 <>

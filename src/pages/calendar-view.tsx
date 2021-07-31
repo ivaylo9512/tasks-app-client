@@ -22,14 +22,14 @@ const CalendarView: React.FC = () => {
     const [dateString, setDateString] = useState<string>('');
     const router = useRouter();
 
-    const updateQuery = (data: TasksByDateQuery) => {
+    const updateCache = (data: TasksByDateQuery) => {
         globalApolloClient!.writeQuery({
-              query: TasksDocument,
-              data: {
-                __typename: "tasks",
-                tasks: data.tasksByDate,
-              },
-            });
+            query: TasksDocument,
+            data: {
+            __typename: "tasks",
+            tasks: data.tasksByDate,
+            },
+        });
     }
 
     const { data: tasks, error, loading, refetch } = useTasksByDateQuery({
@@ -38,7 +38,7 @@ const CalendarView: React.FC = () => {
         },
         skip: !dateString,
         notifyOnNetworkStatusChange: true,
-        onCompleted: updateQuery
+        onCompleted: updateCache
     });
 
     useEffect(() => {
