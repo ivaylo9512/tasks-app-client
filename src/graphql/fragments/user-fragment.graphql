@@ -3,7 +3,7 @@ fragment User on User {
     username
     firstName
     lastName
-    age,
+    birth,
     email,
     role
 }

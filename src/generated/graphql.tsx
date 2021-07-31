@@ -142,8 +142,8 @@ export type RegisterInput = {
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   email: Scalars['String'];
-  age: Scalars['Float'];
-  role: Scalars['String'];
+  birth: Scalars['DateTime'];
+  role?: Maybe<Scalars['String']>;
 };
 
 export type Task = {
@@ -171,8 +171,8 @@ export type TaskInput = {
 };
 
 export type UpdateInput = {
-  age: Scalars['Float'];
   alertAt?: Maybe<Scalars['String']>;
+  birth: Scalars['DateTime'];
   email: Scalars['String'];
   eventDate?: Maybe<Scalars['String']>;
   firstName: Scalars['String'];
@@ -188,7 +188,7 @@ export type UpdateInput = {
 
 export type User = {
   __typename?: 'User';
-  age: Scalars['Int'];
+  birth?: Maybe<Scalars['DateType']>;
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   firstName: Scalars['String'];
@@ -212,7 +212,7 @@ export type TaskFragment = (
 
 export type UserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'age' | 'email' | 'role'>
+  & Pick<User, 'id' | 'username' | 'firstName' | 'lastName' | 'birth' | 'email' | 'role'>
 );
 
 export type TaskByIdQueryVariables = Exact<{
@@ -356,7 +356,7 @@ export const UserFragmentDoc = gql`
   username
   firstName
   lastName
-  age
+  birth
   email
   role
 }
