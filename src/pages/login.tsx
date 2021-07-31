@@ -5,13 +5,27 @@ import { useLoginMutation } from "../generated/graphql";
 import validateEmail from "../helpers/validateEmail";
 import { userClient } from "../helpers/client";
 import usePasswordInput from "../hooks/usePasswordInput";
+import { UserDocument } from "../graphql/cache-queries";
+import { useRouter } from "next/router";
+import { globalApolloClient, withApollo } from "../helpers/create-with-apollo";
 
 const Login: React.FC = () => {
     const [{usernameOrEmail, password}, {usernameOrEmailInput, passwordInput}] = useCreateInputs();
     const [error, setError] = useState<string | undefined>();
+    const router = useRouter();
+
     const [loginMut, { data }] = useLoginMutation({
         client: userClient,
-        errorPolicy: 'all'
+        errorPolicy: 'all',
+        update: (_cache, { data }) => {
+            globalApolloClient!.writeQuery({
+              query: UserDocument,
+              data: {
+                __typename: "Query",
+                user: data?.login,
+              },
+            });
+        }
     })
     
     const login = async(e: FormEvent) => {
@@ -21,13 +35,18 @@ const Login: React.FC = () => {
             ...validateEmail(usernameOrEmail) ? {email: usernameOrEmail} : { username: usernameOrEmail }, 
             password}
 
-        const result = await loginMut({ 
+        const res = await loginMut({ 
             variables:{
                 loginInput
             }
         })
 
-        setError(result.errors?.[0].message);
+        if(res.data?.login){
+            router.push('/')
+            return;
+        }
+
+        setError(res.errors?.[0].message);
     }
 
     return (
@@ -46,7 +65,7 @@ const Login: React.FC = () => {
         </section>
     )
 }
-export default Login
+export default withApollo({ssr: true})(Login)
 
 type Inputs = {
     usernameOrEmailInput: JSX.Element,

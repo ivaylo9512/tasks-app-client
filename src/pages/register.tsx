@@ -8,17 +8,28 @@ import useEffectInitial from '../hooks/useEffectInitital';
 import { useRouter } from 'next/router';
 import { userClient } from '../helpers/client';
 import usePasswordInput from '../hooks/usePasswordInput';
+import { UserDocument } from '../graphql/cache-queries';
+import { globalApolloClient } from '../helpers/create-with-apollo';
 
 const Register: React.FC = () => {
     const [registerValues, { usernameInput, passwordInput, repeatPasswordInput, birthInput, emailInput, firstNameInput, lastNameInput }] = useCreateFields(); 
     const [error, setError] = useState<RegisterError>({});
+    const router = useRouter();
 
     const [registerMut, { data: registerUser }] = useRegisterMutation({
         client: userClient,
-        errorPolicy: 'all'
+        errorPolicy: 'all',
+        update: (_cache, { data }) => {
+            globalApolloClient!.writeQuery({
+              query: UserDocument,
+              data: {
+                __typename: "Query",
+                user: data?.register,
+              },
+            });
+        }
     }) 
     const [pageCount, setPageCount] = useState(0);
-    const router = useRouter();
 
     const register = async (e: FormEvent) => {
         e.preventDefault();
@@ -35,6 +46,11 @@ const Register: React.FC = () => {
                 }
             }
         });
+
+        if(res.data?.register){
+            router.push('/')
+            return;
+        }
 
         setError(res.errors?.[0].extensions || {});
     }
@@ -171,6 +187,6 @@ const useCreateFields = (): [Values, Inputs] => {
         name: 'email',
         autoComplete: 'email'
     })
-    
+
     return [{username, password, repeatPassword, firstName, lastName, email, birth}, {usernameInput, passwordInput, repeatPasswordInput, firstNameInput, lastNameInput, emailInput, birthInput}]
 }   
