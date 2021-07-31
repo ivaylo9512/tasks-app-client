@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useLoginMutation } from "../generated/graphql";
 import validateEmail from "../helpers/validateEmail";
 import { userClient } from "../helpers/client";
+import usePasswordInput from "../hooks/usePasswordInput";
 
 const Login: React.FC = () => {
     const [{usernameOrEmail, password}, {usernameOrEmailInput, passwordInput}] = useCreateInputs();
@@ -25,7 +26,7 @@ const Login: React.FC = () => {
                 loginInput
             }
         })
-        
+
         setError(result.errors?.[0].message);
     }
 
@@ -58,13 +59,21 @@ type Values = {
 const useCreateInputs = () : [Values, Inputs]=> {
     const [usernameOrEmail, usernameOrEmailInput] = useInput({
         placeholder: 'username or email', 
-        name: 'username'
+        name: 'username',
+        validationRules: {
+            required: true
+        }
     });
-    const [password, passwordInput] = useInput({
+
+    const [password, passwordInput] = usePasswordInput({
         placeholder: 'password', 
         name: 'password', 
         type: 'password',
+        validationRules: {
+            required: true
+        },
         autoComplete: 'current-password',
     });
+
     return [{usernameOrEmail, password}, {usernameOrEmailInput, passwordInput}]
 }

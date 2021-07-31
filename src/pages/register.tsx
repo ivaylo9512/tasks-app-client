@@ -7,6 +7,7 @@ import validateEmail from '../helpers/validateEmail';
 import useEffectInitial from '../hooks/useEffectInitital';
 import { useRouter } from 'next/router';
 import { userClient } from '../helpers/client';
+import usePasswordInput from '../hooks/usePasswordInput';
 
 const Register: React.FC = () => {
     const [registerValues, { usernameInput, passwordInput, repeatPasswordInput, birthInput, emailInput, firstNameInput, lastNameInput }] = useCreateFields(); 
@@ -114,7 +115,7 @@ const useCreateFields = (): [Values, Inputs] => {
         },
     )
 
-    const [password, passwordInput] = useInput({
+    const [password, passwordInput] = usePasswordInput({
         name: 'password',
         type: 'password',
         autoComplete: 'new-password',
@@ -126,7 +127,7 @@ const useCreateFields = (): [Values, Inputs] => {
         }
     })
 
-    const [repeatPassword, repeatPasswordInput] = useInput({
+    const [repeatPassword, repeatPasswordInput] = usePasswordInput({
         name: 'repeat-password',
         type: 'password',
         autoComplete: 'new-password',
@@ -170,5 +171,6 @@ const useCreateFields = (): [Values, Inputs] => {
         name: 'email',
         autoComplete: 'email'
     })
+    
     return [{username, password, repeatPassword, firstName, lastName, email, birth}, {usernameInput, passwordInput, repeatPasswordInput, firstNameInput, lastNameInput, emailInput, birthInput}]
 }   
