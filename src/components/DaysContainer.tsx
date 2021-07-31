@@ -1,9 +1,9 @@
 import Day from "./Day"
 import WeekDays from "./WeekDays"
 import styled from "styled-components"
-import { useState, useEffect, useContext } from "react"
+import { useEffect, useState } from "react"
 import { Task } from "../types"
-import { DateProvider } from "../pages/calendar-view"
+import { useRouter } from 'next/router'
 
 const Days = styled.div`
     display: flex;
@@ -18,7 +18,22 @@ type DayType = {
 }
 
 const DaysContainer: React.FC = () => {
-    const {date, setDate} = useContext(DateProvider);
+    const router = useRouter();
+    const [date, setDate] = useState(() => {
+        const dateParam = router.query.date;
+        
+        if(Array.isArray(dateParam) || !dateParam?.match(/^\d{4}-\d{2}-\d{2}$/)) 
+            return new Date();
+
+        const date = new Date(router.query.date as string);
+        return new Date(date.toString() == 'Invalid Date' ? new Date() : date);
+    });
+
+    useEffect(() => {
+        const utcDate = new Date(date);
+        utcDate.setMinutes(utcDate.getMinutes() - utcDate.getTimezoneOffset());
+        router.push({pathname: '/calendar-view', query: { date: utcDate.toISOString().split('T')[0] }});
+    }, [date])
 
     return(
         <Days>
