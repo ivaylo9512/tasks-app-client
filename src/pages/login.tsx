@@ -1,27 +1,32 @@
 import useInput from "../hooks/useInput"
 import Link from 'next/link'
-import { useRef, useMemo, useEffect, FormEvent } from "react";
-import { UserInput, useLoginMutation } from "../generated/graphql";
+import { FormEvent, useState } from "react";
+import { useLoginMutation } from "../generated/graphql";
 import validateEmail from "../helpers/validateEmail";
 import { userClient } from "../helpers/client";
 
 const Login: React.FC = () => {
-    const loginInput = useRef<UserInput>();
     const [{usernameOrEmail, password}, {usernameOrEmailInput, passwordInput}] = useCreateInputs();
-
+    const [error, setError] = useState<string | undefined>();
     const [loginMut, { data }] = useLoginMutation({
-        client: userClient
+        client: userClient,
+        errorPolicy: 'all'
     })
     
-    const login = (e: FormEvent) => {
+    const login = async(e: FormEvent) => {
         e.preventDefault();
         
-        const variables = { 
+        const loginInput = { 
             ...validateEmail(usernameOrEmail) ? {email: usernameOrEmail} : { username: usernameOrEmail }, 
             password}
-        loginMut({
-            variables
+
+        const result = await loginMut({ 
+            variables:{
+                loginInput
+            }
         })
+        
+        setError(result.errors?.[0].message);
     }
 
     return (
@@ -30,11 +35,10 @@ const Login: React.FC = () => {
                 {usernameOrEmailInput}
                 {passwordInput}
                 
-                <div className='errors'>
-                    {data?.login.errors?.map((err, i) => 
-                        <span key={i}>{err.message}</span>
-                    )}
-                </div>
+                {error && 
+                    <span>{error}</span>
+
+                }
                 <span>Don't have an account?<Link href="/register"> Sign up.</Link></span>
                 <button>login</button>
             </form>
