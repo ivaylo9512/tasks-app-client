@@ -22,7 +22,6 @@ type DateContext = {
 } 
 
 const CalendarView: React.FC = () => {
-    const value = useMemo(() => ({date, setDate}), [date, setDate]);
     const [dateString, setDateString] = useState<string>('');
     const router = useRouter();
 
@@ -34,12 +33,27 @@ const CalendarView: React.FC = () => {
         notifyOnNetworkStatusChange: true,
     });
 
+    useEffect(() => {
+            const dateParam = router.query.date;
+
+            if(!Array.isArray(dateParam) && dateParam?.match(/^\d{4}-\d{2}-\d{2}$/) && new Date(router.query.date as string).toString() != 'Invalid Date'){
+                setDateString(dateParam)
+                return;
+            } 
+    
+            const utcDate = new Date();
+            utcDate.setMinutes(utcDate.getMinutes() - utcDate.getTimezoneOffset());
+            router.push({pathname: '/calendar-view', query: { date: utcDate.toISOString().split('T')[0] }});
+    },[router.query.date])
+
     return(
         <Section>
-            <Container>
-                <Calendar />
-                <TaskView />
-            </Container>
+            {dateString &&
+                <Container>
+                    <Calendar />
+                    <TaskView />
+                </Container>
+            }
         </Section>
     )
 }

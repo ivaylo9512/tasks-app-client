@@ -19,27 +19,23 @@ type DayType = {
 
 const DaysContainer: React.FC = () => {
     const router = useRouter();
-    const [date, setDate] = useState(() => {
-        const dateParam = router.query.date;
-        
-        if(Array.isArray(dateParam) || !dateParam?.match(/^\d{4}-\d{2}-\d{2}$/)) 
-            return new Date();
-
-        const date = new Date(router.query.date as string);
-        return new Date(date.toString() == 'Invalid Date' ? new Date() : date);
-    });
+    const [date, setDate] = useState<Date | undefined>();
 
     useEffect(() => {
+        setDate(new Date(router.query.date as string))
+    }, [router.query.date])
+
+    const setDateQuery = (date: Date) => {
         const utcDate = new Date(date);
         utcDate.setMinutes(utcDate.getMinutes() - utcDate.getTimezoneOffset());
         router.push({pathname: '/calendar-view', query: { date: utcDate.toISOString().split('T')[0] }});
-    }, [date])
+    }
 
     return(
         <Days>
             <WeekDays />
-            {Array.from(generateDays(date.getFullYear(), date.getMonth()).values()).map(day =>
-                <Day setDate={() => setDate(day.date)} key={day.date.toISOString()} day={day.date.getDate()} hasEvent={!!day.tasks && day.tasks.length > 0} />
+            {date && Array.from(generateDays(date.getFullYear(), date.getMonth()).values()).map(day =>
+                <Day setDate={() => setDateQuery(day.date)} key={day.date.toISOString()} day={day.date.getDate()} hasEvent={!!day.tasks && day.tasks.length > 0} />
             )}
         </Days>
     )
